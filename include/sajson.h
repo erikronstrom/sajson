@@ -500,6 +500,14 @@ public:
             return false;
         }
     }
+    
+    inline bool is_string() const {
+        return value_tag == tag::string;
+    }
+    
+    inline bool is_number() const {
+        return value_tag == tag::integer || value_tag == tag::double_;
+    }
 
     /// Returns the length of the object or array.
     /// Only legal if get_type() is TYPE_ARRAY or TYPE_OBJECT.
@@ -554,7 +562,77 @@ public:
             return value(tag::null, 0, 0);
         }
     }
-
+    
+    // Bracket operator is synonym for get_value_of_key
+    inline const value operator[](const string& key) const
+    {
+        return get_value_of_key(key);
+    }
+    inline const value operator[](const char* key) const
+    {
+        return get_value_of_key(string(key, strlen(key)));
+    }
+    inline const value operator[](std::string& key) const
+    {
+        return get_value_of_key(string(key.c_str(), key.length()));
+    }
+    
+    // Define some equality inqeuality operators
+    bool operator== (const std::string other) const
+    { return (value_tag == tag::string) && (other == as_string()); }
+    bool operator!= (const std::string other) const
+    { return (value_tag != tag::string) || (other != as_string()); }
+    bool operator== (const char* other) const
+    { return (value_tag == tag::string) && (strcmp(as_cstring(), other) == 0); }
+    bool operator!= (const char* other) const
+    { return (value_tag != tag::string) || (strcmp(as_cstring(), other) != 0); }
+    bool operator== (int other) const
+    { return ((value_tag == tag::integer) && (other == get_integer_value()))
+        || ((value_tag == tag::double_) && (other == get_double_value())); }
+    inline bool operator!= (int other) const
+    { return !(operator==(other)); }
+    bool operator== (double other) const
+    { return is_number() && (other == get_number_value()); }
+    bool operator!= (double other) const
+    { return !is_number() || (other != get_number_value()); }
+    bool operator> (double other) const
+    { return is_number() && (get_number_value() > other); }
+    bool operator>= (double other) const
+    { return is_number() && (get_number_value() >= other); }
+    bool operator< (double other) const
+    { return is_number() && (get_number_value() < other); }
+    bool operator<= (double other) const
+    { return is_number() && (get_number_value() <= other); }
+    
+    /// Returns a string representation of the value
+    /// suitable for debugging.
+    const std::string debug() const
+    {
+        switch (value_tag) {
+            case tag::integer:
+                return std::to_string(get_integer_value());
+            case tag::double_:
+                return std::to_string(get_double_value());
+            case tag::null:
+                return std::string("null");
+            case tag::false_:
+                return std::string("false");
+            case tag::true_:
+                return std::string("true");
+            case tag::string: {
+                std::ostringstream ss;
+                ss << std::quoted(as_string());
+                return ss.str();
+            }
+            case tag::array:
+                return std::string("(array)");
+            case tag::object:
+                return std::string("(object)");
+        }
+        assert(!"unreachable");
+    }
+    
+    
     /// Given a string key, returns the index of the associated value if
     /// one exists.  Returns get_length() if there is no such key.
     /// Note: sajson sorts object keys, so the running time is O(lg N).
@@ -604,6 +682,19 @@ public:
             return get_integer_value();
         } else {
             return get_double_value();
+        }
+    }
+    
+    /// Returns a numeric value as a double-precision float.
+    /// If get_type() is not TYPE_INTEGER or TYPE_DOUBLE,
+    /// returns def.
+    double get_number_value(double def) const {
+        if (value_tag == tag::integer) {
+            return get_integer_value();
+        } else if (value_tag == tag::double_) {
+            return get_double_value();
+        } else {
+            return def;
         }
     }
 

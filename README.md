@@ -1,5 +1,7 @@
 [![Documentation](https://img.shields.io/badge/docs-docsforge-blue)](http://sajson.docsforge.com/)
 
+This is a fork of sajson with some convenience methods and operators added to the value class.
+
 # sajson
 
 sajson is an extremely high-performance, in-place, DOM-style JSON parser written in C++.
