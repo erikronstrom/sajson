@@ -628,6 +628,50 @@ public:
                 return std::string("(array)");
             case tag::object:
                 return std::string("(object)");
+    
+    /// Serialize the value back to a json string
+    const std::string serialize() const
+    {
+        switch (value_tag) {
+            case tag::integer:
+                return std::to_string(get_integer_value());
+            case tag::double_:
+                return std::to_string(get_double_value());
+            case tag::null:
+                return std::string("null");
+            case tag::false_:
+                return std::string("false");
+            case tag::true_:
+                return std::string("true");
+            case tag::string: {
+                std::ostringstream ss;
+                ss << std::quoted(as_string());
+                return ss.str();
+            }
+            case tag::array: {
+                std::ostringstream ss;
+                ss << "[";
+                size_t len = get_length();
+                for (int i = 0; i < len; i++) {
+                    if (i > 0) ss << ",";
+                    ss << get_array_element(i).serialize();
+                }
+                ss << "]";
+                return ss.str();
+            }
+            case tag::object: {
+                std::ostringstream ss;
+                ss << "{";
+                size_t len = get_length();
+                for (int i = 0; i < len; i++) {
+                    if (i > 0) ss << ",";
+                    ss << std::quoted(get_object_key(i).as_string()) << ":"
+                       << get_object_value(i).serialize();
+                }
+                ss << "}";
+                return ss.str();
+            }
+
         }
         assert(!"unreachable");
     }
