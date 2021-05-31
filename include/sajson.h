@@ -505,8 +505,20 @@ public:
         return value_tag == tag::string;
     }
     
+    inline bool is_integer() const {
+        return value_tag == tag::integer;
+    }
+    
     inline bool is_number() const {
         return value_tag == tag::integer || value_tag == tag::double_;
+    }
+    
+    inline bool is_object() const {
+        return value_tag == tag::object;
+    }
+    
+    inline bool is_array() const {
+        return value_tag == tag::array;
     }
 
     /// Returns the length of the object or array.
