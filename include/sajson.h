@@ -563,7 +563,7 @@ public:
         }
     }
     
-    // Bracket operator is synonym for get_value_of_key
+    // Bracket operator with string is synonym for get_value_of_key
     inline const value operator[](const string& key) const
     {
         return get_value_of_key(key);
@@ -575,6 +575,12 @@ public:
     inline const value operator[](std::string& key) const
     {
         return get_value_of_key(string(key.c_str(), key.length()));
+    }
+    
+    // Bracket operator with integer is synonym for get_array_element
+    inline const value operator[](size_t index) const
+    {
+        return get_array_element(index);
     }
     
     // Define some equality inqeuality operators
