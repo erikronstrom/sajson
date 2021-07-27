@@ -463,6 +463,8 @@ public:
         : value_tag{ tag::null }
         , payload{ nullptr }
         , text{ nullptr } {}
+    
+    virtual ~value() = default;
 
     /// Returns the JSON value's \ref type.
     type get_type() const {
