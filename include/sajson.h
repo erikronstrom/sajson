@@ -370,6 +370,12 @@ struct object_key_record {
         return length == str.length()
             && 0 == memcmp(str.data(), object_data + key_start, length);
     }
+    
+    bool match(const char* object_data, const char* str) const {
+        size_t length = key_end - key_start;
+        return length == strlen(str)
+            && 0 == memcmp(str, object_data + key_start, length);
+    }
 };
 
 struct object_key_comparator {
