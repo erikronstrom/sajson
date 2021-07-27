@@ -651,9 +651,12 @@ public:
                 return ss.str();
             }
             case tag::array:
-                return std::string("(array)");
+                return std::string("\"(array)\"");
             case tag::object:
-                return std::string("(object)");
+                return std::string("\"(object)\"");
+        }
+        assert(!"unreachable");
+    }
     
     /// Serialize the value back to a json string
     const std::string serialize() const
